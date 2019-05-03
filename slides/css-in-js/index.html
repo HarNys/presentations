@@ -1,0 +1,361 @@
+<!doctype html>
+<html>
+	<head>
+		<!--
+			This presentation is inspired by Sara Vieira's talk about the same subject on react meetup Oslo
+			
+			Sorces: 
+			- https://www.styled-components.com/docs
+			- Sara Vieira's talk
+		-->
+
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>CSS IN JS</title>
+
+		<link rel="stylesheet" href="../../css/reveal.css">
+		<link rel="stylesheet" href="../../css/theme/black.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="../../lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? '../../css/print/pdf.css' : '../../css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+		<style>
+			.reveal div.disclaimer {
+				font-size: 8pt;
+			}
+			.reveal section img.vy {
+				display: inline-block;
+				width: 100px;
+				background: none;
+				border: none;
+				box-shadow: none;
+				margin: 0 8px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+					<h1>css in js</h1>
+				</section>
+				<section>
+					<h2>Some myths about css in js</h2>
+				</section>
+					
+				<section>
+					<section>
+						css in js is a new trend
+					</section>
+					<section>
+						<img src="assets/jsss.png" />
+					</section>
+				</section>
+
+				<section>
+					<section>
+						it's not css / You don't have to know css
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							That does not even make sense.
+							```javascript
+							const Button = styled.a`
+								display: inline-block;
+								border-radius: 3px;
+								padding: 0.5rem 0;
+								margin: 0.5rem 1rem;
+								width: 11rem;
+								background: transparent;
+								color: white;
+								border: 2px solid white;
+							`
+							```
+						</textarea>
+					</section>
+				</section>
+				
+				<section>
+					<section>
+						It's not real css
+					</section>
+					<section>
+						What is real css?
+					</section>
+				</section>
+				
+				<section>
+					<section>
+						It's inline styling
+					</section>
+					<section>
+						Most of CSS in JS libraries create classes.
+					</section>
+				</section>
+				
+				<section>
+					<section>
+						It feels wrong
+					</section>
+					<section>
+						Yes, but you will get used to it!
+					</section>
+				</section>
+				
+				<section>
+					<section>
+						It's slower then CSS
+					</section>
+					<section>
+						Yes ofcorse it is. It's JavaScript
+					</section>
+				</section>
+				
+				<section>
+					<h2>
+					But <img src="assets/vy.png" class="vy" /> should we use it?
+				</h2>
+				</section>
+
+				<section>
+					<section>Conditionals in css</section>
+					<section data-markdown>
+						<textarea data-template>
+							```
+							const fontWeight = (weight: 'light' | 'regular' | 'medium') => {
+								switch (weight) {
+									case 'light':
+										return {
+											fontWeight: '300',
+											// to get the same look on android as on iOS we need to make the texts fainter.
+											opacity: Platform.OS === 'android' ? 0.6 : 1
+										};
+									case 'regular':
+										return {
+											fontWeight: '400',
+										};
+									case 'medium':
+										return {
+											fontWeight: '500',
+										};
+									default:
+										return { };
+								}
+							}
+							```
+							```
+							inputText: {
+								color: black,
+								...fontWeight('regular')
+							}
+							```
+						</textarea>
+					</section>
+				</section>
+
+				<section>
+						<section>
+							<h3>Change css based on props</h3>
+						</section>
+						<section data-markdown>
+							<textarea data-template>
+									```css
+									class1: {
+										background: #efefef;
+										color: green
+									}
+									class2: {
+										background: #efefef;
+										color: red
+									}
+									```
+									```javascript
+									export const Button = (props) => (
+										<button class="`${props.primary? 'class1' : 'class2'}`">
+											{props.text}
+										</button>
+									)
+									```
+							</textarea>
+						</section>
+						<section data-markdown>
+								<textarea data-template>
+										```javascript
+										const Button = styled.button`
+											background: #efefef;
+											color: ${props => props.primary? 'green' : 'red'}
+										`;
+										```
+										```
+										<Button primary={true}>my button</Button>
+										<Button primary={false}>my button</Button>
+										```
+										![buttons](assets/buttons.png)
+								</textarea>
+							</section>
+						<aside class="notes">
+						</aside>
+				</section>
+				
+				<section>
+					<section>Scoped selectors</section>
+					<section data-markdown>
+						<textarea data-template>
+						![facepalm gif](assets/facepalm.gif)
+						```css
+						div {
+							padding: 8px;
+							background: hotpink;
+						}
+						```
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+								No more polluting the global namespace
+								```
+								MaterialCard = (props) => (
+									<div>
+										{props.children}
+									</div>
+								)
+								export default MaterialCardStyled = styled(MaterialCard)`
+									padding: 8px;
+									background: hotpink;
+								`
+								```
+						</textarea>
+					</section>
+				</section>
+				
+				<section data-markdown>
+					<textarea data-template>
+					### Code reuse
+					```javascript
+					const calculateShadows = elevation => ({
+						elevation,
+						shadowColor: BLACK_COLOR,
+						shadowOffset: { width: elevation, height: elevation },
+						shadowOpacity: 0.3,
+						shadowRadius: elevation,
+					})
+					```
+					```javascript
+					selectContainer: {
+						flexDirection: 'row',
+						justifyContent: 'space-between',
+						backgroundColor: DEFAULT_CONTAINER_COLOR,
+						width: Window.width - (GUTTER_WIDTH * 2),
+						padding:'0 8',
+						margin: '2 0',
+						...calculateShadows(1)
+					}
+					```
+					</textarea>
+				</section>
+				
+				<section>
+					<h3>Vendor prefixing</h3>
+					<div>Most CSS in JS libraries will give you this for free</div>
+				</section>
+				
+				<section>
+					<section>
+						Media Queris still work
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							```
+							const page = styled.div`
+								display: flex;
+								flex-direction: row;
+								@media (max-width: 768px) {
+									flex-direction: column;
+								}
+							`;
+							```
+						</textarea>
+					</section>
+					<section data-markdown>
+						<textarea data-template>
+							```
+							const size = {
+								mobile: '425px',
+								tablet: '768px',
+								desktop: '2560px'
+							}
+							```
+							```
+							export const device = {
+								mobile: `(min-width: ${size.mobile})`,
+								tablet: `(min-width: ${size.tablet})`,
+								desktop: `(min-width: ${size.desktop})`
+							}
+							```
+							```
+							Page = styled.div`
+								margin: auto;
+								font-family: "sans-serif";
+								text-align: center;
+
+								@media ${device.laptop} {
+									max-width: 800px;
+								}
+
+								@media ${device.desktop} {
+									max-width: 1400px;
+								}
+							`;
+							```
+						</textarea>
+					</section>
+				</section>
+
+				<section>
+					You can literally do anything you want in css
+					<div><a href="https://codesandbox.io/s/914lmo2v8r" target="_blank">https://codesandbox.io/s/914lmo2v8r</a></div>
+				</section>
+
+				<section>
+						<img src="https://i.giphy.com/media/MCZ39lz83o5lC/giphy.webp" />
+						<div>It's javascript</div>
+				</section>
+
+				<section>
+					<h3>Some honrabel mentions</h3>
+					<ul>
+							<li>Styled components</li>
+							<li>JSS</li>
+							<li>Radium</li>
+							<li>Aphrodite</li>
+							<li>Emotion</li>
+							<li>Fela</li>
+					</ul>
+				</section>
+			</div>
+		</div>
+
+		<script src="../../lib/js/head.min.js"></script>
+		<script src="../../js/reveal.js"></script>
+
+		<script>
+			Reveal.initialize({
+				dependencies: [
+					{ src: '../../plugin/markdown/marked.js' },
+					{ src: '../../plugin/markdown/markdown.js' },
+					{ src: '../../plugin/notes/notes.js', async: true },
+					{ src: '../../plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
